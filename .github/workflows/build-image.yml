@@ -1,0 +1,28 @@
+---
+name: Build ReadySkills github-actions-runner
+
+on:
+  push:
+    branches:
+      - main
+    
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build -t ghcr.io/jobready/skills-github-actions-runner:${GITHUB_RUN_NUMBER} -t ghcr.io/jobready/skills-github-actions-runner:latest .
+      
+      - name: Login to GHCR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ghcr.io
+          username: $GITHUB_ACTOR
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Push image(s)
+        run: docker push ghcr.io/jobready/skills-github-actions-runner --all-tags
